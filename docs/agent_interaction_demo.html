@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Interaction Demo</title>
+  <style>
+    :root {
+      --bg: #f4efe7;
+      --panel: rgba(255, 252, 246, 0.9);
+      --panel-strong: #fff9f0;
+      --line: #d8c9b0;
+      --text: #2d241a;
+      --muted: #6b5a47;
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --accent-3: #2563eb;
+      --success: #3f7d20;
+      --warn: #a16207;
+      --shadow: 0 20px 60px rgba(64, 40, 14, 0.12);
+      --radius: 8px;
+      --mono: "Consolas", "SFMono-Regular", ui-monospace, monospace;
+      --sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(180, 83, 9, 0.10), transparent 24%),
+        linear-gradient(180deg, #f8f3eb 0%, #efe4d2 100%);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(216, 201, 176, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .sidebar {
+      padding: 20px;
+      position: sticky;
+      top: 18px;
+      align-self: start;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.08;
+      font-weight: 800;
+    }
+
+    .lede {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      font: inherit;
+      line-height: 1.45;
+      background: var(--panel-strong);
+      color: var(--text);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .segmented button,
+    .action-row button,
+    .preset-list button {
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+    }
+
+    .segmented button.active {
+      background: #e0f2ef;
+      border-color: rgba(15, 118, 110, 0.4);
+      color: #0b5b54;
+      font-weight: 700;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .action-row .primary {
+      background: linear-gradient(135deg, #0f766e, #115e59);
+      color: #fff;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .preset-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .preset-list button {
+      text-align: left;
+      min-height: 56px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .main {
+      display: grid;
+      gap: 18px;
+    }
+
+    .summary {
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      background: rgba(255, 249, 240, 0.75);
+      border: 1px solid rgba(216, 201, 176, 0.72);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 96px;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .metric .value {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.05;
+    }
+
+    .metric .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .flow-wrap {
+      padding: 18px 18px 20px;
+    }
+
+    .flow-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .flow-header h2,
+    .log-panel h2,
+    .result-panel h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .flow-header .sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .agent {
+      position: relative;
+      min-height: 168px;
+      background: rgba(255, 249, 240, 0.9);
+      border: 1px solid rgba(216, 201, 176, 0.8);
+      border-radius: 8px;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .agent::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 3px;
+      background: rgba(15, 118, 110, 0.12);
+      transition: background 180ms ease;
+    }
+
+    .agent.active::after {
+      background: linear-gradient(90deg, var(--accent), var(--accent-3));
+    }
+
+    .agent.complete::after {
+      background: linear-gradient(90deg, var(--success), var(--accent));
+    }
+
+    .agent.skipped::after {
+      background: rgba(107, 90, 71, 0.24);
+    }
+
+    .agent-name {
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .agent-role {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      min-height: 34px;
+      margin-bottom: 12px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      background: rgba(107, 90, 71, 0.1);
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .status.active {
+      background: rgba(15, 118, 110, 0.12);
+      color: #0a5e57;
+    }
+
+    .status.complete {
+      background: rgba(63, 125, 32, 0.12);
+      color: #326417;
+    }
+
+    .status.skipped {
+      background: rgba(107, 90, 71, 0.1);
+      color: var(--muted);
+    }
+
+    .agent-notes {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .connector {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      margin: 10px 0 4px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .parallel-row {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .parallel-row .spacer {
+      border: 1px dashed rgba(216, 201, 176, 0.7);
+      border-radius: 8px;
+      min-height: 168px;
+      background: rgba(255, 249, 240, 0.4);
+    }
+
+    .log-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .log-panel,
+    .result-panel {
+      padding: 18px 20px 20px;
+    }
+
+    .log-list {
+      display: grid;
+      gap: 10px;
+      max-height: 410px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .log-item {
+      border: 1px solid rgba(216, 201, 176, 0.75);
+      background: rgba(255, 249, 240, 0.72);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .log-item .time {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent-3);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .log-item .title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .log-item .body {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .result-box,
+    .meta-box {
+      background: rgba(255, 249, 240, 0.78);
+      border: 1px solid rgba(216, 201, 176, 0.75);
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .result-box {
+      min-height: 250px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .meta-box {
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      background: rgba(37, 99, 235, 0.1);
+      color: #1f4cb2;
+    }
+
+    .hint-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-left: 3px solid var(--accent-2);
+      background: rgba(245, 158, 11, 0.08);
+      font-size: 12px;
+      line-height: 1.5;
+      color: #6f4c12;
+      border-radius: 0 8px 8px 0;
+    }
+
+    @media (max-width: 1120px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .summary,
+      .grid,
+      .parallel-row,
+      .log-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .parallel-row .spacer {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <aside class="panel sidebar">
+      <div class="eyebrow">Bonus Task 1</div>
+      <h1>Agent Interaction Demo</h1>
+      <p class="lede">
+        Small demo surface for visualising how the repo routes one legal question through the
+        multi-agent system. It mirrors the current Stage 5 behavior: Registry discovery,
+        Customer entry, Law orchestration, then parallel specialist branches.
+      </p>
+
+      <div class="field">
+        <label for="question">Question</label>
+        <textarea id="question">If a company breaks a contract and avoids taxes, what are the legal and regulatory consequences?</textarea>
+      </div>
+
+      <div class="field">
+        <label>Mode</label>
+        <div class="segmented" id="modeSwitch">
+          <button type="button" data-mode="stage4">Stage 4</button>
+          <button type="button" data-mode="stage5" class="active">Stage 5</button>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button type="button" class="primary" id="runDemo">Run Demo</button>
+        <button type="button" id="resetDemo">Reset</button>
+      </div>
+
+      <div class="field" style="margin-top: 18px;">
+        <label>Presets</label>
+        <div class="preset-list">
+          <button type="button" data-question="If a company breaks a contract and avoids taxes, what are the legal and regulatory consequences?">Contract breach + tax evasion</button>
+          <button type="button" data-question="If a company suffers a customer data breach, what privacy and compliance obligations apply?">Privacy + compliance</button>
+          <button type="button" data-question="Can an employer in Vietnam terminate an employee for repeated poor performance?">Labor law only</button>
+        </div>
+      </div>
+
+      <div class="hint-box">
+        The demo is deterministic on purpose, so it is stable for presentation and easy to explain on top of the real backend logs.
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="panel summary">
+        <div class="metric">
+          <div class="label">Trace ID</div>
+          <div class="value" id="traceValue">trace-demo</div>
+          <div class="hint">Shared across every hop for debugging.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Context ID</div>
+          <div class="value" id="contextValue">ctx-demo</div>
+          <div class="hint">Conversation scope propagated between agents.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Branches</div>
+          <div class="value" id="branchValue">0</div>
+          <div class="hint">Specialist paths triggered by routing.</div>
+        </div>
+        <div class="metric">
+          <div class="label">Latency Demo</div>
+          <div class="value" id="latencyValue">0.00s</div>
+          <div class="hint">Estimated interaction timeline for this run.</div>
+        </div>
+      </section>
+
+      <section class="panel flow-wrap">
+        <div class="flow-header">
+          <h2>Flow Map</h2>
+          <div class="sub" id="modeCaption">Distributed A2A path with registry discovery</div>
+        </div>
+
+        <div class="grid">
+          <div class="agent" id="registryAgent">
+            <div class="agent-name">Registry</div>
+            <div class="agent-role">Service discovery and registration metadata.</div>
+            <div class="status" id="registryStatus">Idle</div>
+            <div class="agent-notes" id="registryNotes">Waiting for lookup request.</div>
+          </div>
+          <div class="agent" id="customerAgent">
+            <div class="agent-name">Customer Agent</div>
+            <div class="agent-role">Entry point that forwards the question into the specialist network.</div>
+            <div class="status" id="customerStatus">Idle</div>
+            <div class="agent-notes" id="customerNotes">No request received yet.</div>
+          </div>
+          <div class="agent" id="lawAgent">
+            <div class="agent-name">Law Agent</div>
+            <div class="agent-role">Lead orchestrator for legal framing and routing.</div>
+            <div class="status" id="lawStatus">Idle</div>
+            <div class="agent-notes" id="lawNotes">Awaiting delegated question.</div>
+          </div>
+          <div class="agent" id="aggregateAgent">
+            <div class="agent-name">Aggregator</div>
+            <div class="agent-role">Combines partial analyses into a single answer.</div>
+            <div class="status" id="aggregateStatus">Idle</div>
+            <div class="agent-notes" id="aggregateNotes">No synthesis yet.</div>
+          </div>
+          <div class="agent" id="responseAgent">
+            <div class="agent-name">Client Response</div>
+            <div class="agent-role">Final answer returned to the user with trace context.</div>
+            <div class="status" id="responseStatus">Idle</div>
+            <div class="agent-notes" id="responseNotes">Response not ready.</div>
+          </div>
+        </div>
+
+        <div class="connector">Parallel specialist fan-out</div>
+
+        <div class="parallel-row">
+          <div class="agent" id="taxAgent">
+            <div class="agent-name">Tax Agent</div>
+            <div class="agent-role">Tax penalties, IRS/FBAR/FATCA, enforcement exposure.</div>
+            <div class="status" id="taxStatus">Idle</div>
+            <div class="agent-notes" id="taxNotes">Not routed.</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="agent" id="complianceAgent">
+            <div class="agent-name">Compliance Agent</div>
+            <div class="agent-role">SEC, SOX, AML, governance, and privacy compliance.</div>
+            <div class="status" id="complianceStatus">Idle</div>
+            <div class="agent-notes" id="complianceNotes">Not routed.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="log-grid">
+        <div class="panel log-panel">
+          <div class="flow-header">
+            <h2>Event Timeline</h2>
+            <span class="badge" id="timelineBadge">Ready</span>
+          </div>
+          <div class="log-list" id="logList"></div>
+        </div>
+
+        <div class="panel result-panel">
+          <div class="flow-header">
+            <h2>Demo Output</h2>
+            <span class="badge" id="resultBadge">Idle</span>
+          </div>
+          <div class="result-box" id="resultBox">Press “Run Demo” to animate one request through the system.</div>
+          <div class="meta-box" id="metaBox">trace_id=trace-demo
+context_id=ctx-demo
+delegation_depth=0
+mode=stage5</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      mode: "stage5",
+      running: false,
+      timers: [],
+    };
+
+    const AGENTS = {
+      registry: { card: "registryAgent", status: "registryStatus", notes: "registryNotes" },
+      customer: { card: "customerAgent", status: "customerStatus", notes: "customerNotes" },
+      law: { card: "lawAgent", status: "lawStatus", notes: "lawNotes" },
+      tax: { card: "taxAgent", status: "taxStatus", notes: "taxNotes" },
+      compliance: { card: "complianceAgent", status: "complianceStatus", notes: "complianceNotes" },
+      aggregate: { card: "aggregateAgent", status: "aggregateStatus", notes: "aggregateNotes" },
+      response: { card: "responseAgent", status: "responseStatus", notes: "responseNotes" },
+    };
+
+    const el = (id) => document.getElementById(id);
+
+    function routeQuestion(question) {
+      const lower = question.toLowerCase();
+      return {
+        tax: ["tax", "irs", "evasion", "avoidance", "fbar", "fatca"].some((k) => lower.includes(k)),
+        compliance: ["compliance", "regulatory", "sec", "sox", "aml", "fcpa", "privacy", "data", "gdpr", "consequences"].some((k) => lower.includes(k)),
+      };
+    }
+
+    function analyzeQuestion(question) {
+      const routing = routeQuestion(question);
+      const lines = [];
+      lines.push("Question received:");
+      lines.push(question);
+      lines.push("");
+      lines.push("Routing summary:");
+      lines.push(`- needs_tax: ${routing.tax}`);
+      lines.push(`- needs_compliance: ${routing.compliance}`);
+      lines.push("");
+      lines.push("Expected output shape:");
+      lines.push("- law analysis");
+      if (routing.tax) lines.push("- tax analysis");
+      if (routing.compliance) lines.push("- compliance analysis");
+      lines.push("- final aggregated answer");
+      return { routing, preview: lines.join("\n") };
+    }
+
+    function resetTimers() {
+      state.timers.forEach((timer) => clearTimeout(timer));
+      state.timers = [];
+    }
+
+    function schedule(delay, fn) {
+      const timer = setTimeout(fn, delay);
+      state.timers.push(timer);
+    }
+
+    function setAgentState(key, status, note) {
+      const config = AGENTS[key];
+      const card = el(config.card);
+      const statusEl = el(config.status);
+      const notesEl = el(config.notes);
+
+      card.classList.remove("active", "complete", "skipped");
+      statusEl.className = "status";
+
+      if (status === "active") {
+        card.classList.add("active");
+        statusEl.classList.add("active");
+        statusEl.textContent = "Running";
+      } else if (status === "complete") {
+        card.classList.add("complete");
+        statusEl.classList.add("complete");
+        statusEl.textContent = "Complete";
+      } else if (status === "skipped") {
+        card.classList.add("skipped");
+        statusEl.classList.add("skipped");
+        statusEl.textContent = "Skipped";
+      } else {
+        statusEl.textContent = "Idle";
+      }
+
+      notesEl.textContent = note;
+    }
+
+    function resetBoard() {
+      resetTimers();
+      state.running = false;
+      [
+        ["registry", "idle", "Waiting for lookup request."],
+        ["customer", "idle", "No request received yet."],
+        ["law", "idle", "Awaiting delegated question."],
+        ["tax", "idle", "Not routed."],
+        ["compliance", "idle", "Not routed."],
+        ["aggregate", "idle", "No synthesis yet."],
+        ["response", "idle", "Response not ready."],
+      ].forEach(([key, status, note]) => setAgentState(key, status, note));
+
+      el("logList").innerHTML = "";
+      el("timelineBadge").textContent = "Ready";
+      el("resultBadge").textContent = "Idle";
+      el("resultBox").textContent = "Press “Run Demo” to animate one request through the system.";
+      el("latencyValue").textContent = "0.00s";
+      el("branchValue").textContent = "0";
+    }
+
+    function addLog(time, title, body) {
+      const item = document.createElement("div");
+      item.className = "log-item";
+      item.innerHTML = `
+        <div class="time">${time}</div>
+        <div class="title">${title}</div>
+        <div class="body">${body}</div>
+      `;
+      el("logList").prepend(item);
+    }
+
+    function shortId(prefix) {
+      return `${prefix}-${Math.random().toString(16).slice(2, 8)}`;
+    }
+
+    function renderSummary(traceId, contextId, branchCount, latency) {
+      el("traceValue").textContent = traceId;
+      el("contextValue").textContent = contextId;
+      el("branchValue").textContent = String(branchCount);
+      el("latencyValue").textContent = `${latency.toFixed(2)}s`;
+      el("metaBox").textContent =
+`trace_id=${traceId}
+context_id=${contextId}
+delegation_depth=0
+mode=${state.mode}
+branches=${branchCount}`;
+    }
+
+    function finalAnswer(question, routing) {
+      const lines = [];
+      lines.push("Stage 5 response summary");
+      lines.push("");
+      lines.push(`Question: ${question}`);
+      lines.push("");
+      lines.push("Included sections:");
+      lines.push("- contract and civil liability");
+      if (routing.tax) lines.push("- tax exposure and enforcement");
+      if (routing.compliance) lines.push("- regulatory and compliance risk");
+      lines.push("");
+      lines.push("This demo mirrors the backend path: Customer -> Law -> specialists -> aggregation.");
+      lines.push("The real backend response comes from the running Python agents and OpenRouter model.");
+      return lines.join("\n");
+    }
+
+    function runDemo() {
+      if (state.running) return;
+      state.running = true;
+      resetBoard();
+      state.running = true;
+
+      const question = el("question").value.trim();
+      const traceId = shortId("trace");
+      const contextId = shortId("ctx");
+      const analysis = analyzeQuestion(question);
+      const routing = analysis.routing;
+      const branchCount = Number(routing.tax) + Number(routing.compliance);
+      const latency = state.mode === "stage5"
+        ? 1.2 + branchCount * 1.6
+        : 0.8 + branchCount * 1.1;
+
+      renderSummary(traceId, contextId, branchCount, latency);
+      el("timelineBadge").textContent = "Running";
+      el("resultBadge").textContent = state.mode === "stage5" ? "A2A" : "In-Process";
+      el("modeCaption").textContent = state.mode === "stage5"
+        ? "Distributed A2A path with registry discovery"
+        : "In-process graph with parallel sub-agent sends";
+      el("resultBox").textContent = analysis.preview;
+
+      schedule(120, () => {
+        setAgentState("customer", "active", "Question accepted and trace metadata attached.");
+        addLog("00:00.12", "Customer Agent", "Accepted the user question and prepared a handoff into the legal orchestration path.");
+      });
+
+      if (state.mode === "stage5") {
+        schedule(500, () => {
+          setAgentState("registry", "active", "Resolving the Law Agent endpoint from registered capabilities.");
+          addLog("00:00.50", "Registry Lookup", "Customer Agent asked the Registry which endpoint handles `legal_question`.");
+        });
+
+        schedule(1080, () => {
+          setAgentState("registry", "complete", "Law Agent endpoint discovered and returned.");
+          setAgentState("customer", "complete", "Delegated request to Law Agent over A2A.");
+          addLog("00:01.08", "A2A Delegation", "Customer Agent forwarded the question with `trace_id`, `context_id`, and delegation depth.");
+        });
+      } else {
+        schedule(420, () => {
+          setAgentState("customer", "complete", "Forwarded control directly to the in-process law node.");
+          addLog("00:00.42", "StateGraph Handoff", "Customer node handed the shared state into the in-process Law Agent.");
+        });
+      }
+
+      schedule(1320, () => {
+        setAgentState("law", "active", "Producing general legal framing and deciding specialist routing.");
+        addLog("00:01.32", "Law Agent", "Built the first-pass legal analysis and checked whether tax/compliance specialists are needed.");
+      });
+
+      schedule(2250, () => {
+        setAgentState("law", "complete", "Routing complete. Dispatching specialist branches in parallel.");
+        addLog("00:02.25", "Routing Decision", `needs_tax=${routing.tax}, needs_compliance=${routing.compliance}.`);
+
+        if (routing.tax) {
+          setAgentState("tax", "active", "Analysing tax exposure, penalties, and enforcement risk.");
+        } else {
+          setAgentState("tax", "skipped", "No tax keywords matched this question.");
+        }
+
+        if (routing.compliance) {
+          setAgentState("compliance", "active", "Reviewing regulatory and governance obligations.");
+        } else {
+          setAgentState("compliance", "skipped", "No compliance keywords matched this question.");
+        }
+      });
+
+      schedule(3350, () => {
+        if (routing.tax) {
+          setAgentState("tax", "complete", "Returned tax-specific analysis to the Law Agent.");
+          addLog("00:03.35", "Tax Agent", "Tax branch completed and sent its result back into the aggregation path.");
+        }
+      });
+
+      schedule(3580, () => {
+        if (routing.compliance) {
+          setAgentState("compliance", "complete", "Returned compliance-specific analysis to the Law Agent.");
+          addLog("00:03.58", "Compliance Agent", "Compliance branch completed and sent its result back into the aggregation path.");
+        }
+      });
+
+      schedule(4100, () => {
+        setAgentState("aggregate", "active", "Combining all completed specialist outputs into one response.");
+        addLog("00:04.10", "Aggregation", "Law Agent is now stitching together the general, tax, and compliance analyses.");
+      });
+
+      schedule(5000, () => {
+        setAgentState("aggregate", "complete", "Final synthesis complete.");
+        setAgentState("response", "active", "Sending final answer back to the client.");
+        el("resultBox").textContent = finalAnswer(question, routing);
+        addLog("00:05.00", "Client Return", "Final answer packaged and returned through the customer-facing boundary.");
+      });
+
+      schedule(5600, () => {
+        setAgentState("response", "complete", `Delivered response with simulated latency ${latency.toFixed(2)}s.`);
+        el("timelineBadge").textContent = "Complete";
+        el("resultBadge").textContent = "Ready";
+        state.running = false;
+      });
+    }
+
+    document.querySelectorAll("#modeSwitch button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("#modeSwitch button").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        state.mode = button.dataset.mode;
+        el("modeCaption").textContent = state.mode === "stage5"
+          ? "Distributed A2A path with registry discovery"
+          : "In-process graph with parallel sub-agent sends";
+      });
+    });
+
+    document.querySelectorAll(".preset-list button").forEach((button) => {
+      button.addEventListener("click", () => {
+        el("question").value = button.dataset.question;
+      });
+    });
+
+    el("runDemo").addEventListener("click", runDemo);
+    el("resetDemo").addEventListener("click", resetBoard);
+
+    resetBoard();
+  </script>
+</body>
+</html>

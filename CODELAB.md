@@ -432,3 +432,56 @@ Nếu gặp vấn đề:
 - Đề xuất phương án giảm latency và demo + show thời gian xử lý đã giảm được khi apply phương án?
 
 **Chúc các bạn học tốt! 🚀**
+### Tra loi bai tap cong diem
+
+**Y 1. File HTML demo tuong tac agent**
+
+- File demo da tao: `docs/agent_interaction_demo.html`
+- File nay demo duoc luong tuong tac agent o Stage 4 va Stage 5:
+  - nhap cau hoi
+  - chon Stage 4 hoac Stage 5
+  - xem flow Registry -> Customer Agent -> Law Agent -> Tax Agent / Compliance Agent -> Aggregate
+  - xem trace_id, context_id, so nhanh song song, latency demo va timeline su kien
+
+**Y 2. Do latency va giam latency cho Stage 5**
+
+**a. Latency truoc khi toi uu**
+
+- Latency do duoc tu `test_client.py`: `315.69 seconds`
+
+**b. Nguyen nhan latency cao**
+
+Stage 5 ban dau co nhieu luot goi LLM noi tiep:
+
+- Customer Agent goi LLM de quyet dinh delegate
+- Law Agent goi LLM de phan tich phap ly tong quat
+- Law Agent goi LLM de routing tax/compliance
+- Tax Agent goi LLM
+- Compliance Agent goi LLM
+- Law Agent goi them 1 luot LLM de aggregate ket qua
+
+Vi co nhieu hop LLM, tong thoi gian cho 1 request rat lon.
+
+**c. Phuong an giam latency da ap dung**
+
+Da ap dung 4 toi uu chinh:
+
+1. Customer Agent bo buoc LLM trung gian va delegate thang sang Law Agent.
+2. Law Agent bo routing bang LLM, thay bang keyword router nhe.
+3. Law Agent bo buoc aggregate bang LLM, thay bang ghep ket qua truc tiep.
+4. Them gioi han `OPENROUTER_MAX_TOKENS`, mac dinh `900`, luc test bonus dat `700`.
+
+**d. Latency sau khi toi uu**
+
+- Latency do duoc sau toi uu: `184.02 seconds`
+
+**e. Ket qua giam latency**
+
+- Truoc toi uu: `315.69 seconds`
+- Sau toi uu: `184.02 seconds`
+- Giam duoc: `131.67 seconds`
+- Ty le giam: khoang `41.7%`
+
+**f. Ket luan**
+
+Phuong an giam latency da co hieu qua ro rang. He thong van giu kien truc multi-agent A2A, van co Registry, Customer Agent, Law Agent, Tax Agent, Compliance Agent, nhung da loai bo cac luot goi LLM khong can thiet. Nho do tong thoi gian tra loi cua Stage 5 giam manh tu `315.69s` xuong `184.02s`.
