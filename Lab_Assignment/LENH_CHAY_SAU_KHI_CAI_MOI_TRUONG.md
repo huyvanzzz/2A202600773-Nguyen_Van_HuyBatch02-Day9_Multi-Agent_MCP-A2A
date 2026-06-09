@@ -3,11 +3,11 @@
 Chay trong PowerShell:
 
 ```powershell
-cd D:\Vin\2A202600773_Nguyen_Van_Huy_Day08_RAG_pipeline_cohort2
+cd D:\Vin\2A202600773-Nguyen_Van_HuyBatch02-Day9_Multi-Agent_MCP-A2A\Lab_Assignment
 .\.venv\Scripts\Activate.ps1
 
-$env:PIP_CACHE_DIR="D:\Vin\2A202600773_Nguyen_Van_Huy_Day08_RAG_pipeline_cohort2\.pip-cache"
-$env:HF_HOME="D:\Vin\2A202600773_Nguyen_Van_Huy_Day08_RAG_pipeline_cohort2\.hf-cache"
+$env:PIP_CACHE_DIR="D:\Vin\2A202600773-Nguyen_Van_HuyBatch02-Day9_Multi-Agent_MCP-A2A\Lab_Assignment\.pip-cache"
+$env:HF_HOME="D:\Vin\2A202600773-Nguyen_Van_HuyBatch02-Day9_Multi-Agent_MCP-A2A\Lab_Assignment\.hf-cache"
 $env:HF_HUB_DISABLE_SYMLINKS_WARNING="1"
 
 python -m pip show crawl4ai markitdown sentence-transformers rank-bm25 chromadb

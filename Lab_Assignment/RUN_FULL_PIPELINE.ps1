@@ -1,11 +1,11 @@
 $ErrorActionPreference = "Stop"
 
-Set-Location "D:\Vin\2A202600773_Nguyen_Van_Huy_Day08_RAG_pipeline_cohort2"
+Set-Location $PSScriptRoot
 
 .\.venv\Scripts\Activate.ps1
 
-$env:PIP_CACHE_DIR = "D:\Vin\2A202600773_Nguyen_Van_Huy_Day08_RAG_pipeline_cohort2\.pip-cache"
-$env:HF_HOME = "D:\Vin\2A202600773_Nguyen_Van_Huy_Day08_RAG_pipeline_cohort2\.hf-cache"
+$env:PIP_CACHE_DIR = Join-Path $PSScriptRoot ".pip-cache"
+$env:HF_HOME = Join-Path $PSScriptRoot ".hf-cache"
 $env:HF_HUB_DISABLE_SYMLINKS_WARNING = "1"
 
 Write-Host "1. Crawl Task 2"

@@ -14,6 +14,7 @@ clear multi-agent style architecture without adding a second external service.
 from __future__ import annotations
 
 import json
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -85,6 +86,10 @@ def _tokenize(text: str) -> list[str]:
 
 
 def main() -> None:
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
     supervisor = Supervisor()
     query = "What are the legal consequences if a company breaches a non-disclosure agreement?"
     result = supervisor.answer(query)
@@ -93,4 +98,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

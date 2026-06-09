@@ -119,6 +119,9 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, float]:
 
 
 def format_results_md(result_a: EvaluationResult, result_b: EvaluationResult) -> str:
+    score_a = sum(result_a.average_metrics.values()) / max(len(result_a.average_metrics), 1)
+    score_b = sum(result_b.average_metrics.values()) / max(len(result_b.average_metrics), 1)
+    winner = "Config A" if score_a >= score_b else "Config B"
     lines = [
         "# Group Evaluation Results",
         "",
@@ -134,7 +137,14 @@ def format_results_md(result_a: EvaluationResult, result_b: EvaluationResult) ->
     lines += ["", "## Config B", "", f"- Backend: `{result_b.rows[0]['backend'] if result_b.rows else 'n/a'}`", "", "| Metric | Score |", "|---|---:|"]
     for metric, value in result_b.average_metrics.items():
         lines.append(f"| {metric} | {value:.3f} |")
-    lines += ["", "## Notes", "", "- Config A uses the full retrieval pipeline with reranking.", "- Config B uses dense + lexical merge without reranking.", "- The better config is the one with the higher average across the four metrics."]
+    lines += [
+        "",
+        "## Notes",
+        "",
+        "- Config A uses the full retrieval pipeline with reranking.",
+        "- Config B uses dense + lexical merge without reranking.",
+        f"- Winner on this run: `{winner}`.",
+    ]
     return "\n".join(lines)
 
 
