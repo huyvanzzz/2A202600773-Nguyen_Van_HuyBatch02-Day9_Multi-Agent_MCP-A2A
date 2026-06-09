@@ -44,7 +44,8 @@ async def delegate(
     Returns:
         The agent's text response, or an empty string if none could be extracted.
     """
-    async with httpx.AsyncClient(timeout=300.0) as http_client:
+    timeout = httpx.Timeout(connect=30.0, read=900.0, write=30.0, pool=30.0)
+    async with httpx.AsyncClient(timeout=timeout) as http_client:
         # Fetch agent card
         card_url = f"{endpoint}/.well-known/agent.json"
         card_resp = await http_client.get(card_url)

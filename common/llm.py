@@ -5,8 +5,12 @@ can be selected via the OPENROUTER_MODEL env var.
 """
 
 import os
+import sys
 
 from langchain_openai import ChatOpenAI
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 
 def get_llm() -> ChatOpenAI:
@@ -15,4 +19,6 @@ def get_llm() -> ChatOpenAI:
         model=os.getenv("OPENROUTER_MODEL", "anthropic/claude-sonnet-4-5"),
         openai_api_key=os.getenv("OPENROUTER_API_KEY"),
         openai_api_base="https://openrouter.ai/api/v1",
+        temperature=0.2,
+        max_tokens=int(os.getenv("OPENROUTER_MAX_TOKENS", "900")),
     )

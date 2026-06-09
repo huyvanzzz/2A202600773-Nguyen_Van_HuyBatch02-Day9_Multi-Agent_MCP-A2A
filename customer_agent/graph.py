@@ -50,7 +50,7 @@ def build_graph(trace_id: str, context_id: str, depth: int) -> Any:
         A compiled LangGraph agent.
     """
 
-    @tool
+    @tool(return_direct=True)
     async def delegate_to_legal_agent(question: str) -> str:
         """Send a legal question to the Law Agent for comprehensive analysis.
 

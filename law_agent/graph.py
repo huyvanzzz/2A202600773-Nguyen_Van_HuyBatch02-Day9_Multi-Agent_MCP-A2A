@@ -204,6 +204,51 @@ async def aggregate(state: LawState) -> dict:
     return {"final_answer": result.content}
 
 
+async def fast_check_routing(state: LawState) -> dict:
+    """Fast keyword router for specialist sub-agents."""
+    depth = state.get("delegation_depth", 0)
+    if depth >= MAX_DELEGATION_DEPTH:
+        logger.info("Max delegation depth reached (%d); skipping sub-agents", depth)
+        return {"needs_tax": False, "needs_compliance": False}
+
+    question = state["question"].lower()
+    tax_keywords = ["tax", "irs", "evasion", "avoidance", "fbar", "fatca", "penalty"]
+    compliance_keywords = [
+        "compliance",
+        "regulatory",
+        "regulation",
+        "sec",
+        "sox",
+        "aml",
+        "fcpa",
+        "governance",
+        "consequences",
+    ]
+    needs_tax = any(keyword in question for keyword in tax_keywords)
+    needs_compliance = any(keyword in question for keyword in compliance_keywords)
+    logger.info("Routing decision: needs_tax=%s needs_compliance=%s", needs_tax, needs_compliance)
+    return {"needs_tax": needs_tax, "needs_compliance": needs_compliance}
+
+
+async def fast_aggregate(state: LawState) -> dict:
+    """Fast deterministic aggregation for lower latency."""
+    sections: list[str] = []
+    if state.get("law_analysis"):
+        sections.append(f"## Legal Analysis\n{state['law_analysis']}")
+    if state.get("tax_result"):
+        sections.append(f"## Tax Analysis\n{state['tax_result']}")
+    if state.get("compliance_result"):
+        sections.append(f"## Regulatory Compliance Analysis\n{state['compliance_result']}")
+
+    final_answer = "\n\n---\n\n".join(sections)
+    final_answer += (
+        "\n\n---\n\n"
+        "Disclaimer: This analysis is educational and should be reviewed by "
+        "licensed attorneys and tax professionals for the specific situation."
+    )
+    return {"final_answer": final_answer}
+
+
 # ---------------------------------------------------------------------------
 # Graph construction
 # ---------------------------------------------------------------------------
@@ -213,10 +258,10 @@ def create_graph():
     graph = StateGraph(LawState)
 
     graph.add_node("analyze_law", analyze_law)
-    graph.add_node("check_routing", check_routing)
+    graph.add_node("check_routing", fast_check_routing)
     graph.add_node("call_tax", call_tax)
     graph.add_node("call_compliance", call_compliance)
-    graph.add_node("aggregate", aggregate)
+    graph.add_node("aggregate", fast_aggregate)
 
     graph.set_entry_point("analyze_law")
     graph.add_edge("analyze_law", "check_routing")

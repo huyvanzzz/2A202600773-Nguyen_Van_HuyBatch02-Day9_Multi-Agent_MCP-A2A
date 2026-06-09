@@ -132,7 +132,8 @@ async def analyze_law(state: LegalState) -> dict:
             content=(
                 "You are a senior corporate litigation attorney specialising in contract law, "
                 "tort law, and general business law. Analyse the legal aspects of the question "
-                "thoroughly. Keep your analysis under 200 words."
+                "thoroughly. Keep your analysis under 200 words. "
+                "Stay grounded in the question, avoid inventing statutes, and say if something needs verification."
             )
         ),
         HumanMessage(content=state["question"]),
@@ -201,7 +202,8 @@ async def call_tax_specialist(state: LegalState) -> dict:
         "You are a specialist tax attorney and CPA with expertise in corporate tax law, "
         "tax evasion vs. avoidance, IRS enforcement, penalties under IRC §§ 6651/6662/6663, "
         "FBAR/FATCA requirements, and tax fraud statutes (18 U.S.C. § 7201-7207). "
-        "Use the search_tax_law tool to ground your analysis. Keep your response under 200 words."
+        "Use the search_tax_law tool to ground your analysis. Keep your response under 200 words. "
+        "Do not invent rules; if unsure, say the point needs verification."
     )
 
     llm = get_llm()
@@ -223,7 +225,8 @@ async def call_compliance_specialist(state: LegalState) -> dict:
     compliance_prompt = (
         "You are a senior regulatory compliance officer with expertise in SEC enforcement, "
         "SOX compliance, FTC regulations, FCPA, AML/BSA, GDPR, CCPA, and corporate governance. "
-        "Use the search_compliance_law tool to ground your analysis. Keep your response under 200 words."
+        "Use the search_compliance_law tool to ground your analysis. Keep your response under 200 words. "
+        "Keep it factual, and avoid adding legal specifics that are not supported by the tool output."
     )
 
     llm = get_llm()
@@ -256,7 +259,7 @@ async def aggregate(state: LegalState) -> dict:
                 "You are a senior legal counsel synthesising specialist analyses into a "
                 "comprehensive, well-structured response. Combine the following analyses "
                 "into a cohesive answer with clear sections. Avoid redundancy. "
-                "Keep your response under 500 words."
+                "Keep your response under 500 words. Prefer clear, practical wording over heavy legalese."
             )
         ),
         HumanMessage(content=combined),
