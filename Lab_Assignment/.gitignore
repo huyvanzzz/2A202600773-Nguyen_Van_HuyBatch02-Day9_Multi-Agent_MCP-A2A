@@ -1,0 +1,38 @@
+# Environment and secrets
+.venv/
+.env
+.env.*
+!.env.example
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Package and model caches
+.pip-cache/
+.hf-cache/
+.cache/
+
+# Local vector/index artifacts
+data/index/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Large generated browser/runtime caches
+playwright-report/
+test-results/

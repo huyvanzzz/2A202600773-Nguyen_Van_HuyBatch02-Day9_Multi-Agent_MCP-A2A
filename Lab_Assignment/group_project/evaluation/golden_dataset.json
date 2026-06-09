@@ -1,0 +1,93 @@
+[
+  {
+    "id": "q01",
+    "question": "Van ban nao quy dinh ve phong, chong ma tuy 2021?",
+    "answer": "Luật Phòng, chống ma túy số 73/2021/QH14 là văn bản trọng tâm về phòng, chống ma túy.",
+    "keywords": ["Luật Phòng, chống ma túy", "73/2021/QH14"]
+  },
+  {
+    "id": "q02",
+    "question": "Nghi dinh nao huong dan thi hanh luat phong chong ma tuy?",
+    "answer": "Nghị định 105/2021/NĐ-CP hướng dẫn thi hành Luật Phòng, chống ma túy.",
+    "keywords": ["105/2021/NĐ-CP", "huong dan"]
+  },
+  {
+    "id": "q03",
+    "question": "Bo luat Hinh su co quy dinh nhom toi pham nao ve ma tuy?",
+    "answer": "Bộ luật Hình sự 2015 (sửa đổi 2017) có chương về các tội phạm liên quan đến ma túy.",
+    "keywords": ["Bộ luật Hình sự", "ma túy"]
+  },
+  {
+    "id": "q04",
+    "question": "Nguon data co bao nhieu bai bao tin tuc?",
+    "answer": "Có 5 bài báo trong thư mục news chuẩn hóa.",
+    "keywords": ["5", "article"]
+  },
+  {
+    "id": "q05",
+    "question": "Chunking pipeline su dung splitter nao?",
+    "answer": "Pipeline dùng RecursiveCharacterTextSplitter với chunk size 500 và overlap 50.",
+    "keywords": ["RecursiveCharacterTextSplitter", "500", "50"]
+  },
+  {
+    "id": "q06",
+    "question": "Embedding model nao duoc chon cho Task 4?",
+    "answer": "sentence-transformers/all-MiniLM-L6-v2 được dùng làm embedding model.",
+    "keywords": ["all-MiniLM-L6-v2"]
+  },
+  {
+    "id": "q07",
+    "question": "Vector store nao duoc su dung?",
+    "answer": "ChromaDB persistent local store là vector store chính, kèm JSON backup.",
+    "keywords": ["ChromaDB", "JSON backup"]
+  },
+  {
+    "id": "q08",
+    "question": "Lexical search su dung co che gi?",
+    "answer": "Lexical search mặc định dùng BM25, có fallback pure Python nếu thư viện chưa sẵn sàng.",
+    "keywords": ["BM25", "pure Python"]
+  },
+  {
+    "id": "q09",
+    "question": "Reranking co hai buc nao?",
+    "answer": "RRF dùng để gộp semantic và lexical results, sau đó MMR để tăng diversity.",
+    "keywords": ["RRF", "MMR"]
+  },
+  {
+    "id": "q10",
+    "question": "Task 9 co fallback nao neu hybrid score thap?",
+    "answer": "Pipeline fallback sang PageIndex hoặc local vectorless search nếu điểm hybrid thấp.",
+    "keywords": ["PageIndex", "vectorless"]
+  },
+  {
+    "id": "q11",
+    "question": "Generation task yeu cau citation nhu the nao?",
+    "answer": "Mỗi factual claim phải có citation từ metadata source trong context.",
+    "keywords": ["citation", "source"]
+  },
+  {
+    "id": "q12",
+    "question": "Function nao tra ve answer co citation?",
+    "answer": "generate_with_citation() trả về answer, sources, retrieval_source và generation_backend.",
+    "keywords": ["generate_with_citation"]
+  },
+  {
+    "id": "q13",
+    "question": "Task 4 co lenh build index nao?",
+    "answer": "run_pipeline() sẽ load documents, chunk, embed và index dữ liệu.",
+    "keywords": ["run_pipeline", "index"]
+  },
+  {
+    "id": "q14",
+    "question": "Ket qua search co can sorted descending khong?",
+    "answer": "Có, các kết quả retrieval đều được sort theo score giảm dần.",
+    "keywords": ["sorted", "descending"]
+  },
+  {
+    "id": "q15",
+    "question": "Day 8 pipeline muc tieu la gi?",
+    "answer": "Tạo pipeline RAG end-to-end cho dữ liệu pháp luật và tin tức về ma túy.",
+    "keywords": ["RAG", "phap luat", "tin tuc"]
+  }
+]
+
